@@ -1,24 +1,15 @@
 from __future__ import annotations
-import os
 from typing import Optional
 
-from dotenv import load_dotenv
-
+from app.config import MONGO_URL, MONGO_DB
 from motor.motor_asyncio import AsyncIOMotorClient
-from pathlib import Path
-
-# carrega .env
-ROOT = Path(__file__).resolve().parents[1]
-load_dotenv(dotenv_path=ROOT / ".env")
-
-MONGO_URL = os.getenv("MONGO_URL", "")
-MONGO_DB = os.getenv("MONGO_DB", "chatdb")
 
 # --- DB helpers ---
 _client: Optional[AsyncIOMotorClient] = None
 
-
 def db():
+    """Retorna a instância do banco de dados MongoDB.
+    Lança RuntimeError se MONGO_URL não estiver definido."""
     global _client
     if _client is None:
         if not MONGO_URL:

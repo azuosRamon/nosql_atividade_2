@@ -4,14 +4,23 @@ from fastapi import WebSocket
 
 # --- WebSocket room manager ---
 class WSManager:
+    """
+    Gerencia conexões WebSocket por sala.
+    """
     def __init__(self):
         self.rooms: Dict[str, Set[WebSocket]] = {}
 
     async def connect(self, room: str, ws: WebSocket):
+        """
+        Aceita e adiciona uma conexão WebSocket à sala.
+        """
         await ws.accept()
         self.rooms.setdefault(room, set()).add(ws)
 
     def disconnect(self, room: str, ws: WebSocket):
+        """
+        Remove uma conexão WebSocket da sala.
+        """
         conns = self.rooms.get(room)
         if conns and ws in conns:
             conns.remove(ws)
@@ -19,6 +28,9 @@ class WSManager:
                 self.rooms.pop(room, None)
 
     async def broadcast(self, room: str, payload: dict):
+        """
+        Envia uma mensagem para todos os WebSockets conectados à sala.
+        """
         for ws in list(self.rooms.get(room, [])):
             try:
                 await ws.send_json(payload)
